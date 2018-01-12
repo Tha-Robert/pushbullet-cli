@@ -6,8 +6,6 @@ import getpass
 import datetime
 import os
 import os.path
-import keyring
-import keyrings.alt
 import pushbullet
 import sys
 from .__version__ import __version__
@@ -34,12 +32,7 @@ def _get_pb():
     if 'PUSHBULLET_KEY' in os.environ:
         return pushbullet.PushBullet(os.environ['PUSHBULLET_KEY'])
 
-    password = keyring.get_password("pushbullet", "cli")
-    if not password:
-        raise NoApiKey()
-
-    return pushbullet.PushBullet(password)
-
+    raise NoApiKey()
 
 def _push(data_type, title=None, message=None, channel=None, device=None, file_path=None, url=None):
     pb = _get_pb()
@@ -73,10 +66,7 @@ def _push(data_type, title=None, message=None, channel=None, device=None, file_p
 
 @click.group()
 def main():
-    # The pycrypto encrypted keyring asks for a password in every launch. This is unacceptable.
-    if isinstance(keyring.get_keyring(), keyrings.alt.file.EncryptedKeyring):
-        keyring.set_keyring(keyrings.alt.file.PlaintextKeyring())
-
+    pass
 
 @main.command("purge", help="Delete all your pushes.")
 def purge():
@@ -100,16 +90,13 @@ def list_devices():
         print(u"{0}. {1}".format(i, device.nickname))
 
 
-@main.command("set-key", help="Set your API key.")
+@main.command("set-key", help="Set your API key(not implemented).")
 def set_key():
-    key = getpass.getpass("Enter your security token from https://www.pushbullet.com/account: ")
-    keyring.set_password("pushbullet", "cli", key)
+    pass
 
-
-@main.command("delete-key", help="Remove your API key from the system keyring.")
+@main.command("delete-key", help="Remove your API key from the system keyring(not implemented).")
 def delete_key():
-    keyring.delete_password("pushbullet", "cli")
-
+    pass
 
 @main.command("sms", help="Send an SMS.")
 @click.option("-d", "--device", type=int, default=None, required=True,
